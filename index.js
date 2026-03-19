@@ -4,6 +4,7 @@
 
 import 'dotenv/config';
 import fs from 'fs-extra';
+import express from 'express';
 import {
   Client,
   GatewayIntentBits,
@@ -211,6 +212,7 @@ client.on('interactionCreate', async interaction => {
           value: [
             `\`${PREFIX}setdesc <description>\``,
             `\`${PREFIX}settags <tag1, tag2, tag3>\``
+
           ].join('\n')
         }
       );
@@ -406,21 +408,68 @@ client.on('messageCreate', async message => {
 });
 
 // -----------------------------------------------------
+// Welcome Message (Event Group B)
+// -----------------------------------------------------
+
+client.on('guildMemberAdd', async member => {
+  const channel = member.guild.channels.cache.get('1484065588522385489');
+  if (!channel) return;
+
+  const welcomeEmbed = new EmbedBuilder()
+    .setTitle('!!')
+    .setDescription(
+      `welcome to .gg/lotion ${member} --\n` +
+      `check out our https://discord.com/channels/1483020540070330378/1484066104509857835 and https://discord.com/channels/1483020540070330378/1484066181378998342 \`.\`.\`.`
+    )
+    .setColor(EMBED_COLOR)
+    .setFooter({
+      text: BOT_NAME,
+      iconURL: client.user.displayAvatarURL()
+    });
+
+  channel.send({ embeds: [welcomeEmbed] });
+});
+
+// -----------------------------------------------------
+// Boost Message (Event Group B)
+// -----------------------------------------------------
+
+client.on('guildMemberUpdate', async (oldMember, newMember) => {
+  const wasBoosting = oldMember.premiumSince;
+  const isBoosting = newMember.premiumSince;
+
+  if (!wasBoosting && isBoosting) {
+    const channel = newMember.guild.channels.cache.get('1484093828574089267');
+    if (!channel) return;
+
+    const boostEmbed = new EmbedBuilder()
+      .setTitle('!!')
+      .setDescription(
+        `.gg/lotion has a new boost!\n\n` +
+        `thank you ${newMember} for boosting! <3`
+      )
+      .setColor(EMBED_COLOR)
+      .setFooter({
+        text: BOT_NAME,
+        iconURL: client.user.displayAvatarURL()
+      });
+
+    channel.send({ embeds: [boostEmbed] });
+  }
+});
+
+// -----------------------------------------------------
+// Uptime Server
+// -----------------------------------------------------
+
+const app = express();
+app.get('/', (req, res) => res.send('Bot is alive!'));
+app.listen(process.env.PORT || 3000, () => {
+  console.log('Uptime server running');
+});
+
+// -----------------------------------------------------
 // Login
 // -----------------------------------------------------
 
 client.login(TOKEN);
-
-// ------------------------------
-// Uptime Server (Render / UptimeRobot)
-// ------------------------------
-import express from 'express';
-const app = express();
-
-app.get('/', (req, res) => {
-  res.send('Bot is alive!');
-});
-
-app.listen(process.env.PORT || 3000, () => {
-  console.log('Uptime server running');
-});
