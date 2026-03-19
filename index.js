@@ -410,3 +410,17 @@ client.on('messageCreate', async message => {
 // -----------------------------------------------------
 
 client.login(TOKEN);
+
+// ------------------------------
+// Uptime Server (Render / UptimeRobot)
+// ------------------------------
+import express from 'express';
+const app = express();
+
+app.get('/', (req, res) => {
+  res.send('Bot is alive!');
+});
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log('Uptime server running');
+});
